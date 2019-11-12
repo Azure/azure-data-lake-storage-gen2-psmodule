@@ -38,20 +38,20 @@ Install the module by copying the `AzDls2` folder to one of the PowerShell modul
 
 ``` PowerShell
 # Example: Show the current permissions
-Get-AzDls2ChildItem -StorageAccountName 'azdls172' -FilesyStemName 'container1' -AccessKey $key -Recurse | 
+Get-AzDls2ChildItem -StorageAccountName 'azdls172' -FileSystemName 'container1' -AccessKey $key -Recurse | 
     ForEach-Object {
-        $_ | Add-Member -Force -Type NoteProperty -Name AccessControl -Value ( Get-AzDls2ItemAccessControl -StorageAccountName 'azdls172' -FilesyStemName 'container1' -AccessKey $key -Path $_.Name )
+        $_ | Add-Member -Force -Type NoteProperty -Name AccessControl -Value ( Get-AzDls2ItemAccessControl -StorageAccountName 'azdls172' -FileSystemName 'container1' -AccessKey $key -Path $_.Name )
         $_
     } |
     Out-GridView
 
 # Example: Take the ACL from each folder in the root of the file system and apply it to it's children
-Get-AzDls2ChildItem -StorageAccountName 'azdls172' -FilesyStemName 'container1' -AccessKey $key | 
+Get-AzDls2ChildItem -StorageAccountName 'azdls172' -FileSystemName 'container1' -AccessKey $key | 
     Where-Object {
         $_.isDirectory
     } |
     ForEach-Object {
-        Push-AzDls2ItemAccessControl -StorageAccountName 'azdls172' -FilesystemName 'container1' -AccessKey $key -Directory $_.Name -Recurse
+        Push-AzDls2ItemAccessControl -StorageAccountName 'azdls172' -FileSystemName 'container1' -AccessKey $key -Directory $_.Name -Recurse
     }
 ```
 
