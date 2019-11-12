@@ -1,32 +1,22 @@
 ---
 page_type: sample
 languages:
-- csharp
+- powershell
 products:
-- dotnet
-description: "Add 150 character max description"
-urlFragment: "update-this-to-unique-url-stub"
+- v5.1
+description: "PowerShell module to wrap the Azure Data Lake Store REST API."
+urlFragment: ""
 ---
 
 # Official Microsoft Sample
 
-<!-- 
-Guidelines on README format: https://review.docs.microsoft.com/help/onboard/admin/samples/concepts/readme-template?branch=master
-
-Guidance on onboarding samples to docs.microsoft.com/samples: https://review.docs.microsoft.com/help/onboard/admin/samples/process/onboarding?branch=master
-
-Taxonomies for products and languages: https://review.docs.microsoft.com/new-hope/information-architecture/metadata/taxonomies?branch=master
--->
-
-Give a short description for your sample here. What does it do and why is it important?
+A sample (basic) PowerShell module that wraps the Azure Data Lake Store REST API.
 
 ## Contents
 
-Outline the file contents of the repository. It helps users navigate the codebase, build configuration and any related assets.
-
 | File/folder       | Description                                |
 |-------------------|--------------------------------------------|
-| `src`             | Sample source code.                        |
+| `AzDls2`          | Sample AzDls2 PowerShell module.           |
 | `.gitignore`      | Define what to ignore at commit time.      |
 | `CHANGELOG.md`    | List of changes to the sample.             |
 | `CONTRIBUTING.md` | Guidelines for contributing to the sample. |
@@ -35,19 +25,39 @@ Outline the file contents of the repository. It helps users navigate the codebas
 
 ## Prerequisites
 
-Outline the required components and tools that a user might need to have on their machine in order to run the sample. This can be anything from frameworks, SDKs, OS versions or IDE releases.
+This module was written using PowerShell v5.1.
 
 ## Setup
 
-Explain how to prepare the sample once the user clones or downloads the repository. The section should outline every step necessary to install dependencies and set up any settings (for example, API keys and output folders).
+Install the module by copying the `AzDls2` folder to one of the PowerShell module directories. These directories are saved in the environment variable `%PSModulePath%`. Default locations include:
+
+* C:\Program Files\WindowsPowerShell\Modules
+* C:\Windows\system32\WindowsPowerShell\v1.0\Modules
 
 ## Runnning the sample
 
-Outline step-by-step instructions to execute the sample and see its output. Include steps for executing the sample from the IDE, starting specific services in the Azure portal or anything related to the overall launch of the code.
+``` PowerShell
+# Example: Show the current permissions
+Get-AzDls2ChildItem -StorageAccountName 'azdls172' -FilesyStemName 'container1' -AccessKey $key -Recurse | 
+    ForEach-Object {
+        $_ | Add-Member -Force -Type NoteProperty -Name AccessControl -Value ( Get-AzDls2ItemAccessControl -StorageAccountName 'azdls172' -FilesyStemName 'container1' -AccessKey $key -Path $_.Name )
+        $_
+    } |
+    Out-GridView
+
+# Example: Take the ACL from each folder in the root of the file system and apply it to it's children
+Get-AzDls2ChildItem -StorageAccountName 'azdls172' -FilesyStemName 'container1' -AccessKey $key | 
+    Where-Object {
+        $_.isDirectory
+    } |
+    ForEach-Object {
+        Push-AzDls2ItemAccessControl -StorageAccountName 'azdls172' -FilesystemName 'container1' -AccessKey $key -Directory $_.Name -Recurse
+    }
+```
 
 ## Key concepts
 
-Provide users with more context on the tools and services used in the sample. Explain some of the code that is being used and how services interact with each other.
+The [Azure Data Lake Store REST API](https://docs.microsoft.com/en-us/rest/api/storageservices/data-lake-storage-gen2) provides an interface to administrate Azure Data Lake Storage Gen2. This sample PowerShell module demonstrates how the API can be used to recursively act on a file system instance.
 
 ## Contributing
 
